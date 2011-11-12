@@ -29,12 +29,7 @@ function! operator#sort#sort(motion_wiseness)  "{{{2
     normal! `[v`]y
     let separater = escape(nr2char(getchar()), '\')
     let [xs, ys] = s:partition(@", '\V\[\n ]\*' . separater . '\[\n ]\*')
-
-    let sorter = {}
-    function! sorter.compare(x, y) dict
-      return a:x == '' || a:y == '' ? 0 : a:x > a:y ? 1 : -1
-    endfunction
-    call sort(xs, sorter.compare, sorter)
+    call sort(xs, 's:compare')
 
     let @" = join(map(s:transpose([xs, ys]), 'join(v:val, "")'), '')
     normal! `[v`]P`[
@@ -49,6 +44,13 @@ endfunction
 
 
 " Misc.  "{{{1
+function! s:compare(x, y)  "{{{2
+  return a:x == '' || a:y == '' ? 0 : a:x > a:y ? 1 : -1
+endfunction
+
+
+
+
 function! s:partition(expr, pattern)  "{{{2
   let xs = []
   let ys = []
