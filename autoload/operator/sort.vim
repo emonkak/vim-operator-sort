@@ -27,8 +27,8 @@ function! operator#sort#sort(motion_wiseness)  "{{{2
     let reg_u = [@", getregtype('"')]
 
     normal! `[v`]y
-    let separater = escape(nr2char(getchar()), '\')
-    let [xs, ys] = s:partition(@", '\V\[\n ]\*' . separater . '\[\n ]\*')
+    let separator = escape(nr2char(getchar()), '\')
+    let [xs, ys] = s:partition(@", '\V\[\n ]\*' . separator . '\[\n ]\*')
     call sort(xs, 's:compare')
 
     let @" = join(map(s:transpose([xs, ys]), 'join(v:val, "")'), '')
