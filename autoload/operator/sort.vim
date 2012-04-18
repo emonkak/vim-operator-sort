@@ -24,17 +24,17 @@
 " Interface  "{{{1
 function! operator#sort#sort(motion_wiseness)  "{{{2
   if a:motion_wiseness == 'char'
-    let reg_u = [@", getregtype('"')]
+    let reg_0 = [@0, getregtype('0')]
 
-    normal! `[v`]y
+    normal! `[v`]"0y
     let separator = escape(nr2char(getchar()), '\')
-    let [xs, ys] = s:partition(@", '\V\[\n ]\*' . separator . '\[\n ]\*')
+    let [xs, ys] = s:partition(@0, '\V\[\n ]\*' . separator . '\[\n ]\*')
     call sort(xs, 's:compare')
 
-    let @" = join(map(s:transpose([xs, ys]), 'join(v:val, "")'), '')
-    normal! `[v`]P`[
+    let @0 = join(map(s:transpose([xs, ys]), 'join(v:val, "")'), '')
+    normal! `[v`]"0P`[
 
-    call setreg('"', reg_u[0], reg_u[1])
+    call setreg('0', reg_0[0], reg_0[1])
   else  " line or block
     '[,']sort
   endif
