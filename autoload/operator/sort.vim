@@ -45,7 +45,12 @@ endfunction
 
 " Misc.  "{{{1
 function! s:compare(x, y)  "{{{2
-  return a:x == '' || a:y == '' ? 0 : a:x > a:y ? 1 : -1
+  if a:x == '' || a:y == ''
+    return 0
+  elseif a:x > a:y
+    return 1
+  end
+  return -1
 endfunction
 
 
