@@ -36,16 +36,16 @@ function! operator#sort#sort(motion_wiseness)  "{{{2
 
     call setreg('0', reg_0[0], reg_0[1])
   else  " line or block
-    '[,']sort
+    exec "'[,']sort" s:sort_mode
   endif
 endfunction
 
 
 
 
-" Misc.  "{{{1
-function! s:compare(x, y)  "{{{2
-  if a:x == '' || a:y == ''
+" Comparison  "{{{1
+function! s:compare_modeless(x, y)  "{{{2
+  if a:x == a:y
     return 0
   elseif a:x > a:y
     return 1
@@ -53,6 +53,28 @@ function! s:compare(x, y)  "{{{2
   return -1
 endfunction
 
+
+function! s:is_num(x) abort  "{{{2
+  return a:x =~# '^\d\+'
+endf
+
+
+function! s:compare(x, y)  "{{{2
+  if a:x == '' || a:y == ''
+    return 0
+  elseif s:sort_mode == 'n' && s:is_num(a:x) && s:is_num(a:y)
+    " Non numbers will return 0. Seems good enough.
+    return s:compare_modeless(str2nr(a:x), str2nr(a:y))
+  end
+  return s:compare_modeless(a:x, a:y)
+endfunction
+
+
+
+" Misc.  "{{{1
+function! operator#sort#set_mode(mode)  "{{{2
+  let s:sort_mode = a:mode
+endfunction
 
 
 

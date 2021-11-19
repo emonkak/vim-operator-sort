@@ -29,7 +29,8 @@ endif
 
 
 
-call operator#user#define('sort', 'operator#sort#sort')
+call operator#user#define('sort', 'operator#sort#sort', 'call operator#sort#set_mode("")')
+call operator#user#define('sort-numeric', 'operator#sort#sort', 'call operator#sort#set_mode("n")')
 
 
 
