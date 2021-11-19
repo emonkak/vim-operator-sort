@@ -26,6 +26,7 @@ function! operator#sort#sort(motion_wiseness)  "{{{2
   if a:motion_wiseness == 'char'
     let reg_0 = [@0, getregtype('0')]
 
+    echo "Separator?"
     normal! `[v`]"0y
     let separator = escape(nr2char(getchar()), '\')
     let [xs, ys] = s:partition(@0, '\V\[\n ]\*' . separator . '\[\n ]\*')
