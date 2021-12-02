@@ -22,19 +22,9 @@
 "     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 " }}}
 " Interface  "{{{1
-function! operator#sort#sort(motion_wiseness)  "{{{2
+function! operator#sort#sort(motion_wiseness) abort "{{{2
   if a:motion_wiseness == 'char'
-    let reg_0 = [@0, getregtype('0')]
-
-    normal! `[v`]"0y
-    let separator = escape(nr2char(getchar()), '\')
-    let [xs, ys] = s:partition(@0, '\V\[\n ]\*' . separator . '\[\n ]\*')
-    call sort(xs, 's:compare')
-
-    let @0 = join(map(s:transpose([xs, ys]), 'join(v:val, "")'), '')
-    normal! `[v`]"0P`[
-
-    call setreg('0', reg_0[0], reg_0[1])
+    call s:do_sort_characterwise(s:separator_character(), 0)
   else  " line or block
     '[,']sort
   endif
@@ -43,15 +33,58 @@ endfunction
 
 
 
-" Misc.  "{{{1
-function! s:compare(x, y)  "{{{2
-  return a:x == '' || a:y == '' ? 0 : a:x > a:y ? 1 : -1
+function! operator#sort#sort_reverse(motion_wiseness) abort  "{{{2
+  if a:motion_wiseness == 'char'
+    call s:do_sort_characterwise(s:separator_character(), function('s:compare_reverse'))
+  else  " line or block
+    '[,']sort!
+  endif
 endfunction
 
 
 
 
-function! s:partition(expr, pattern)  "{{{2
+function! operator#sort#sort_numeric(motion_wiseness) abort  "{{{2
+  if a:motion_wiseness == 'char'
+    call s:do_sort_characterwise(s:separator_character(), 'N')
+  else  " line or block
+    '[,']sort n
+  endif
+endfunction
+
+
+
+
+" Misc.  "{{{1
+function! s:do_sort_characterwise(separator, comparer) abort  "{{{2
+  let reg_0 = [@0, getregtype('0')]
+
+  normal! `[v`]"0y
+  let [xs, ys] = s:partition(@0, '\V\[\n ]\*' . escape(a:separator, '\') . '\[\n ]\*')
+  call sort(xs, a:comparer)
+
+  let @0 = join(map(s:transpose([xs, ys]), 'join(v:val, "")'), '')
+  normal! `[v`]"0P`[
+
+  call setreg('0', reg_0[0], reg_0[1])
+endfunction
+
+
+
+
+function! s:compare_reverse(x, y)  "{{{2
+  if a:x < a:y
+    return 1
+  elseif a:x > a:y
+    return -1
+  end
+  return 0
+endfunction
+
+
+
+
+function! s:partition(expr, pattern) abort  "{{{2
   let xs = []
   let ys = []
   let p = 0
@@ -76,7 +109,14 @@ endfunction
 
 
 
-function! s:transpose(xss)  "{{{2
+function! s:separator_character() abort  "{{{2
+  return nr2char(getchar())
+endfunction
+
+
+
+
+function! s:transpose(xss) abort  "{{{2
   let _ = []
 
   for x in a:xss[0]
