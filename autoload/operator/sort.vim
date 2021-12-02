@@ -46,7 +46,7 @@ endfunction
 
 function! operator#sort#sort_numeric(motion_wiseness) abort  "{{{2
   if a:motion_wiseness == 'char'
-    call s:do_sort_characterwise(s:separator_character(), 'N')
+    call s:do_sort_characterwise(s:separator_character(), function('s:compare_numeric'))
   else  " line or block
     '[,']sort n
   endif
@@ -79,6 +79,29 @@ function! s:compare_reverse(x, y)  "{{{2
     return -1
   end
   return 0
+endfunction
+
+
+
+
+function! s:compare_numeric(x, y)  "{{{2
+  " Reference: https://github.com/vim/vim/blob/db9ff9ab5d7ce1fcc2c4106e7ad49151a323996c/src/ex_cmds.c#L320
+  let x_is_num = s:is_number(a:x)
+  let y_is_num = s:is_number(a:y)
+  if x_is_num != y_is_num
+    return x_is_num - y_is_num
+  else
+    let x_num = x_is_num ? str2nr(a:x, 10) : 0
+    let y_num = y_is_num ? str2nr(a:y, 10) : 0
+    return x_num - y_num
+  endif
+endfunction
+
+
+
+
+function! s:is_number(x)  "{{{2
+  return a:x =~ '^-\?\d\+'
 endfunction
 
 
