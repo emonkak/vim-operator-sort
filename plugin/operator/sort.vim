@@ -30,6 +30,8 @@ endif
 
 
 call operator#user#define('sort', 'operator#sort#sort')
+call operator#user#define('sort-reverse', 'operator#sort#sort_reverse')
+call operator#user#define('sort-numeric', 'operator#sort#sort_numeric')
 
 
 
