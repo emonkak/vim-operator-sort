@@ -27,9 +27,9 @@ function! s:test_linewise_operator_sort() abort
   call s:after()
 endfunction
 
-function! s:test_linewise_operator_sort_reverse() abort
+function! s:test_linewise_operator_sort_descending() abort
   call s:before()
-  map <buffer> _ <Plug>(operator-sort-reverse)
+  map <buffer> _ <Plug>(operator-sort-descending)
   normal _G
   call assert_equal(['c', 'b', 'a', '3', '21', '2', '123', '12', '1', '-32'], getline(1, '$'))
   call s:after()
@@ -43,6 +43,15 @@ function! s:test_linewise_operator_sort_numeric() abort
   call s:after()
 endfunction
 
+function! s:test_linewise_operator_sort_numeric_descending() abort
+  call s:before()
+  map <buffer> _ <Plug>(operator-sort-numeric-descending)
+  normal _G
+  call assert_equal(['123', '21', '12', '3', '2', '1', '-32', 'a', 'c', 'b'], getline(1, '$'))
+  call s:after()
+endfunction
+
 call s:test_linewise_operator_sort()
-call s:test_linewise_operator_sort_reverse()
+call s:test_linewise_operator_sort_descending()
 call s:test_linewise_operator_sort_numeric()
+" call s:test_linewise_operator_sort_numeric_descending()

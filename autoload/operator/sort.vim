@@ -33,9 +33,9 @@ endfunction
 
 
 
-function! operator#sort#sort_reverse(motion_wiseness) abort  "{{{2
+function! operator#sort#sort_descending(motion_wiseness) abort  "{{{2
   if a:motion_wiseness == 'char'
-    call s:do_sort_characterwise(s:separator_character(), function('s:compare_reverse'))
+    call s:do_sort_characterwise(s:separator_character(), function('s:compare_descending'))
   else  " line or block
     '[,']sort!
   endif
@@ -47,6 +47,17 @@ endfunction
 function! operator#sort#sort_numeric(motion_wiseness) abort  "{{{2
   if a:motion_wiseness == 'char'
     call s:do_sort_characterwise(s:separator_character(), function('s:compare_numeric'))
+  else  " line or block
+    '[,']sort n
+  endif
+endfunction
+
+
+
+
+function! operator#sort#sort_numeric_descending(motion_wiseness) abort  "{{{2
+  if a:motion_wiseness == 'char'
+    call s:do_sort_characterwise(s:separator_character(), function('s:compare_numeric_descending'))
   else  " line or block
     '[,']sort n
   endif
@@ -72,10 +83,10 @@ endfunction
 
 
 
-function! s:compare_reverse(x, y)  "{{{2
+function! s:compare_descending(x, y)  "{{{2
   if a:x < a:y
     return 1
-  elseif a:x > a:y
+  else
     return -1
   end
   return 0
@@ -95,6 +106,13 @@ function! s:compare_numeric(x, y)  "{{{2
     let y_num = y_is_num ? str2nr(a:y, 10) : 0
     return x_num - y_num
   endif
+endfunction
+
+
+
+
+function! s:compare_numeric_descending(x, y)  "{{{2
+  return s:compare_numeric(a:y, a:x)
 endfunction
 
 
