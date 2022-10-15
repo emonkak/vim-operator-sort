@@ -30,7 +30,7 @@ function! s:test_characterwise_operator_sort_numeric() abort
   call s:before()
   map <buffer> _ <Plug>(operator-sort-numeric)
   execute 'normal _$ '
-  call assert_equal(['a', 'c', 'b', '-32', '1', '2', '3', '12', '21', '123'], split(getline(1), ' '))
+  call assert_equal(['a', 'b', 'c', '-32', '1', '2', '3', '12', '21', '123'], split(getline(1), ' '))
   call s:after()
 endfunction
 
@@ -38,11 +38,6 @@ function! s:test_characterwise_operator_sort_numeric_descending() abort
   call s:before()
   map <buffer> _ <Plug>(operator-sort-numeric-descending)
   execute 'normal _$ '
-  call assert_equal(['123', '21', '12', '3', '2', '1', '-32', 'a', 'c', 'b'], split(getline(1), ' '))
+  call assert_equal(['123', '21', '12', '3', '2', '1', '-32', 'c', 'b', 'a'], split(getline(1), ' '))
   call s:after()
 endfunction
-
-call s:test_characterwise_operator_sort()
-call s:test_characterwise_operator_sort_descending()
-call s:test_characterwise_operator_sort_numeric()
-call s:test_characterwise_operator_sort_numeric_descending()

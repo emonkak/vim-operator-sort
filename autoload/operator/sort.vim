@@ -1,28 +1,4 @@
-" operator-sort - Operator for sort
-" Version: 0.0.0
-" Copyright (C) 2011 emonkak <emonkak@gmail.com>
-" License: MIT license  {{{
-"     Permission is hereby granted, free of charge, to any person obtaining
-"     a copy of this software and associated documentation files (the
-"     "Software"), to deal in the Software without restriction, including
-"     without limitation the rights to use, copy, modify, merge, publish,
-"     distribute, sublicense, and/or sell copies of the Software, and to
-"     permit persons to whom the Software is furnished to do so, subject to
-"     the following conditions:
-"
-"     The above copyright notice and this permission notice shall be included
-"     in all copies or substantial portions of the Software.
-"
-"     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-"     OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-"     MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-"     IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-"     CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-"     TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-"     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-" }}}
-" Interface  "{{{1
-function! operator#sort#sort(motion_wiseness) abort "{{{2
+function! operator#sort#sort(motion_wiseness) abort
   if a:motion_wiseness == 'char'
     call s:do_sort_characterwise(s:separator_character(), 0)
   else  " line or block
@@ -30,10 +6,7 @@ function! operator#sort#sort(motion_wiseness) abort "{{{2
   endif
 endfunction
 
-
-
-
-function! operator#sort#sort_descending(motion_wiseness) abort  "{{{2
+function! operator#sort#sort_descending(motion_wiseness) abort
   if a:motion_wiseness == 'char'
     call s:do_sort_characterwise(s:separator_character(), function('s:compare_descending'))
   else  " line or block
@@ -41,10 +14,7 @@ function! operator#sort#sort_descending(motion_wiseness) abort  "{{{2
   endif
 endfunction
 
-
-
-
-function! operator#sort#sort_numeric(motion_wiseness) abort  "{{{2
+function! operator#sort#sort_numeric(motion_wiseness) abort
   if a:motion_wiseness == 'char'
     call s:do_sort_characterwise(s:separator_character(), function('s:compare_numeric'))
   else  " line or block
@@ -52,22 +22,15 @@ function! operator#sort#sort_numeric(motion_wiseness) abort  "{{{2
   endif
 endfunction
 
-
-
-
-function! operator#sort#sort_numeric_descending(motion_wiseness) abort  "{{{2
+function! operator#sort#sort_numeric_descending(motion_wiseness) abort
   if a:motion_wiseness == 'char'
     call s:do_sort_characterwise(s:separator_character(), function('s:compare_numeric_descending'))
   else  " line or block
-    '[,']sort n
+    '[,']sort! n
   endif
 endfunction
 
-
-
-
-" Misc.  "{{{1
-function! s:do_sort_characterwise(separator, comparer) abort  "{{{2
+function! s:do_sort_characterwise(separator, comparer) abort
   let reg_0 = [@0, getregtype('0')]
 
   normal! `[v`]"0y
@@ -80,10 +43,7 @@ function! s:do_sort_characterwise(separator, comparer) abort  "{{{2
   call setreg('0', reg_0[0], reg_0[1])
 endfunction
 
-
-
-
-function! s:compare_descending(x, y)  "{{{2
+function! s:compare_descending(x, y) abort
   if a:x < a:y
     return 1
   else
@@ -92,40 +52,30 @@ function! s:compare_descending(x, y)  "{{{2
   return 0
 endfunction
 
-
-
-
-function! s:compare_numeric(x, y)  "{{{2
+function! s:compare_numeric(x, y) abort
   " Reference: https://github.com/vim/vim/blob/db9ff9ab5d7ce1fcc2c4106e7ad49151a323996c/src/ex_cmds.c#L320
   let x_is_num = s:is_number(a:x)
   let y_is_num = s:is_number(a:y)
-  if x_is_num != y_is_num
-    return x_is_num - y_is_num
+  if x_is_num == y_is_num
+    if x_is_num
+      return str2nr(a:x, 10) - str2nr(a:y, 10)
+    else
+      return a:x == a:y ? 0 : a:x > a:y ? 1 : -1
+    endif
   else
-    let x_num = x_is_num ? str2nr(a:x, 10) : 0
-    let y_num = y_is_num ? str2nr(a:y, 10) : 0
-    return x_num - y_num
+    return x_is_num - y_is_num
   endif
 endfunction
 
-
-
-
-function! s:compare_numeric_descending(x, y)  "{{{2
+function! s:compare_numeric_descending(x, y) abort
   return s:compare_numeric(a:y, a:x)
 endfunction
 
-
-
-
-function! s:is_number(x)  "{{{2
+function! s:is_number(x) abort
   return a:x =~ '^-\?\d\+'
 endfunction
 
-
-
-
-function! s:partition(expr, pattern) abort  "{{{2
+function! s:partition(expr, pattern) abort
   let xs = []
   let ys = []
   let p = 0
@@ -147,17 +97,11 @@ function! s:partition(expr, pattern) abort  "{{{2
   return [xs, ys]
 endfunction
 
-
-
-
-function! s:separator_character() abort  "{{{2
+function! s:separator_character() abort
   return nr2char(getchar())
 endfunction
 
-
-
-
-function! s:transpose(xss) abort  "{{{2
+function! s:transpose(xss) abort
   let _ = []
 
   for x in a:xss[0]
@@ -171,9 +115,3 @@ function! s:transpose(xss) abort  "{{{2
 
   return _
 endfunction
-
-
-
-
-" __END__  "{{{1
-" vim: foldmethod=marker
