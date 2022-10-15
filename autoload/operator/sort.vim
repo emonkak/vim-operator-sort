@@ -8,7 +8,8 @@ endfunction
 
 function! operator#sort#sort_descending(motion_wiseness) abort
   if a:motion_wiseness == 'char'
-    call s:do_sort_characterwise(s:separator_character(), function('s:compare_descending'))
+    call s:do_sort_characterwise(s:separator_character(),
+    \                            function('s:compare_descending'))
   else  " line or block
     '[,']sort!
   endif
@@ -16,7 +17,8 @@ endfunction
 
 function! operator#sort#sort_numeric(motion_wiseness) abort
   if a:motion_wiseness == 'char'
-    call s:do_sort_characterwise(s:separator_character(), function('s:compare_numeric'))
+    call s:do_sort_characterwise(s:separator_character(),
+    \                            function('s:compare_numeric'))
   else  " line or block
     '[,']sort n
   endif
@@ -24,7 +26,8 @@ endfunction
 
 function! operator#sort#sort_numeric_descending(motion_wiseness) abort
   if a:motion_wiseness == 'char'
-    call s:do_sort_characterwise(s:separator_character(), function('s:compare_numeric_descending'))
+    call s:do_sort_characterwise(s:separator_character(),
+    \                            function('s:compare_numeric_descending'))
   else  " line or block
     '[,']sort! n
   endif
@@ -34,7 +37,9 @@ function! s:do_sort_characterwise(separator, comparer) abort
   let reg_0 = [@0, getregtype('0')]
 
   normal! `[v`]"0y
-  let [xs, ys] = s:partition(@0, '\V\[\n ]\*' . escape(a:separator, '\') . '\[\n ]\*')
+  let [xs, ys] = s:partition(@0, '\V\[\n ]\*'
+  \            . escape(a:separator, '\')
+  \            . '\[\n ]\*')
   call sort(xs, a:comparer)
 
   let @0 = join(map(s:transpose([xs, ys]), 'join(v:val, "")'), '')
