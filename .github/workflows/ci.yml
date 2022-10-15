@@ -1,0 +1,15 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Install packages
+      run: sudo apt-get -y install vim
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+    - name: Run tests
+      run: ./test.vim

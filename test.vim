@@ -91,8 +91,8 @@ function s:run(root)
     endfor
   endif
 
-  echo 'result:'
-  \    (len(errors) > 0 ? "FAILED." : "ok.")
+  echo 'test result:'
+  \    (len(errors) > 0 ? 'FAILED.' : 'ok.')
   \    passed 'passed;'
   \    len(errors) 'failed;'
   \    'finished in' (elapsed_time . 's')
