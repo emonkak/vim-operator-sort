@@ -23,7 +23,7 @@ function s:run(root)
 
   let test_functions = filter(
   \   map(split(OUTPUT, '\n'),
-  \       { i, line -> matchstr(line, '^function \zs<SNR>\d\+_test\w\+') }),
+  \       { i, line -> matchstr(line, '^function \zs<SNR>\d\+_test\%(_\w\+\)\?\>') }),
   \   { i, name -> name != '' }
   \ )
 
@@ -51,8 +51,8 @@ function s:run(root)
         let messages = map(
         \   copy(v:errors),
         \   { i, message -> substitute(
-        \       get(split(message, '\.\.'), -1),
-        \       '^<SNR>\w\+\sline\s\d\+:\zs\s',
+        \       join(split(message, '\.\.')[3:], "\n"),
+        \       '<SNR>\w\+\zs\s\zeline\s\d\+:',
         \       "\n",
         \       ''
         \     )
@@ -85,9 +85,8 @@ function s:run(root)
     for error in errors
       echo '----' error.script_name . '::' . error.test_name '----'
       for message in error.messages
-        echo message
+        echo message "\n"
       endfor
-      echon "\n"
     endfor
   endif
 
