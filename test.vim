@@ -2,7 +2,7 @@
 
 function s:run(root)
   let &runtimepath .= ',' . a:root
-  let &runtimepath .= ',' . a:root . '/test/.deps/*'
+  let &packpath .= ',' . a:root
 
   for test in globpath(a:root, 'test/**/*.vim', 0, 1)
     source `=test`

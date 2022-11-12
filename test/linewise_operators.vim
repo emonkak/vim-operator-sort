@@ -1,4 +1,6 @@
-runtime! plugin/operator/sort.vim
+silent packadd! vim-operator-user
+
+silent runtime! plugin/operator/sort.vim
 
 function! s:before() abort
   new
