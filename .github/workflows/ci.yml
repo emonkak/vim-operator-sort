@@ -6,10 +6,16 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+    - name: Add Neovim repository
+      run: sudo add-apt-repository ppa:neovim-ppa/stable
+    - name: Update packages
+      run: sudo apt-get -y update
     - name: Install packages
-      run: sudo apt-get -y install vim
+      run: sudo apt-get -y install neovim vim
     - uses: actions/checkout@v3
       with:
         submodules: recursive
-    - name: Run tests
-      run: ./test.vim
+    - name: Run tests in Vim
+      run: VIM=vim ./test.vim
+    - name: Run tests in Neovim
+      run: VIM=nvim ./test.vim

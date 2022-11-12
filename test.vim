@@ -1,4 +1,4 @@
-#!/usr/bin/env -S vim -u NONE -i NONE -N -n -e -s --cmd "source %"
+#!/bin/env -S bash -c '${VIM-vim} -u NONE -i NONE -N -n -e -s --cmd "source %" $0'
 
 function s:run(root)
   let &runtimepath .= ',' . a:root
@@ -30,6 +30,11 @@ function s:run(root)
   let passed = 0
   let errors = []
 
+  redir => OUTPUT
+  silent 0verbose version
+  redir END
+
+  echo matchstr(OUTPUT, '^\n*\zs[^\n]\+') "\n"
   echo 'running'
   \    len(test_functions)
   \    (len(test_functions) > 1 ? 'tests' : 'test')
@@ -51,8 +56,8 @@ function s:run(root)
         let messages = map(
         \   copy(v:errors),
         \   { i, message -> substitute(
-        \       join(split(message, '\.\.')[3:], "\n"),
-        \       '<SNR>\w\+\zs\s\zeline\s\d\+:',
+        \       join(split(message, '\.\.')[1:], "\n"),
+        \       '^\S\+\zs\s\zeline\s\d\+:',
         \       "\n",
         \       ''
         \     )
@@ -69,7 +74,7 @@ function s:run(root)
         echon 'ok' "\n"
       endif
     catch
-      let message = get(split(v:throwpoint, '\.\.'), -1) . "\n" . v:exception
+      let message = join(split(v:throwpoint, '\.\.')[1:], "\n") . "\n" . v:exception
       call add(errors, {
       \   'script_name': script_name,
       \   'test_name': test_name,
