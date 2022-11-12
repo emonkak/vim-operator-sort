@@ -1,53 +1,50 @@
 #!/bin/env -S bash -c '${VIM-vim} -u NONE -i NONE -N -n -e -s --cmd "source %" $0'
 
-function s:run(root)
-  let &runtimepath .= ',' . a:root
-  let &packpath .= ',' . a:root
+function s:run(runtime_dir) abort
+  let &runtimepath .= ',' . a:runtime_dir
+  let &packpath .= ',' . a:runtime_dir
 
-  for test in globpath(a:root, 'test/**/*.vim', 0, 1)
+  for test in globpath(a:runtime_dir, 'test/**/*.vim', 0, 1)
     source `=test`
   endfor
 
-  redir => OUTPUT
-  silent 0verbose scriptnames
-  redir END
-
-  let script_names = map(
-  \   split(OUTPUT, '\n'),
-  \   { i, line -> fnamemodify(matchstr(line, '^\s*\d\+:\s\zs.*'), ':t:r') }
-  \ )
-
-  redir => OUTPUT
-  silent 0verbose function
-  redir END
+  let script_paths = {}
+  for line in split(execute('0verbose scriptnames'), '\n')
+    let matches = matchlist(line, '^\s*\(\d\+\):\s\(.*\)')
+    if empty(matches)
+      continue
+    endif
+    let script_num = matches[1]
+    let script_path = fnamemodify(matches[2], ':p')
+    if stridx(script_path, a:runtime_dir . '/test/') == 0
+      let script_paths[script_num] = script_path
+    endif
+  endfor
 
   let test_functions = filter(
-  \   map(split(OUTPUT, '\n'),
-  \       { i, line -> matchstr(line, '^function \zs<SNR>\d\+_test\%(_\w\+\)\?\>') }),
-  \   { i, name -> name != '' }
+  \   map(split(execute('0verbose function'), '\n'),
+  \       { i, line ->
+  \         matchstr(line, '^function \zs<SNR>\d\+_test\%(_\w\+\)\?\>') }),
+  \   { i, name -> has_key(script_paths, matchstr(name, '^<SNR>\zs\d\+')) }
   \ )
 
-  let passed = 0
-  let errors = []
-
-  redir => OUTPUT
-  silent 0verbose version
-  redir END
-
-  echo matchstr(OUTPUT, '^\n*\zs[^\n]\+') "\n"
+  echo matchstr(execute('version'), '^\n*\zs[^\n]\+') "\n"
   echo 'running'
   \    len(test_functions)
   \    (len(test_functions) > 1 ? 'tests' : 'test')
   \    "\n"
 
+  let passed = 0
+  let errors = []
   let start_time = reltime()
 
   for test_function in test_functions
-    let script_num = str2nr(matchstr(test_function, '^<SNR>\zs\d\+'), 10)
-    let script_name = get(script_names, script_num - 1)
+    let script_num = matchstr(test_function, '^<SNR>\zs\d\+')
+    let script_name = fnamemodify(script_paths[script_num], ':t:r')
     let test_name = substitute(test_function, '^<SNR>\d\+_', '', 'I')
 
     echon script_name '::' test_name ' ... '
+
     let v:errors = []
     try
       call call(test_function, [])
@@ -74,7 +71,9 @@ function s:run(root)
         echon 'ok' "\n"
       endif
     catch
-      let message = join(split(v:throwpoint, '\.\.')[1:], "\n") . "\n" . v:exception
+      let message = join(split(v:throwpoint, '\.\.')[1:], "\n")
+      \             . "\n"
+      \             . v:exception
       call add(errors, {
       \   'script_name': script_name,
       \   'test_name': test_name,
@@ -84,7 +83,8 @@ function s:run(root)
     endtry
   endfor
 
-  let elapsed_time = trim(reltimestr(reltime(start_time)))
+  let elapsed_time = substitute(reltimestr(reltime(start_time)),
+  \                             '^\s*', '', '')
 
   if len(errors) > 0
     for error in errors
