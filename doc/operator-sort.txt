@@ -1,0 +1,112 @@
+*operator-sort.txt*	Operators to sort a text
+
+Author: Shota Nozaki <emonkak@gmail.com>
+License: MIT license
+
+==============================================================================
+CONTENTS					*operator-sort-contents*
+
+Introduction	|operator-sort-introduction|
+Usage		|operator-sort-usage|
+Interface	|operator-sort-interface|
+  Key Mappings	|operator-sort-key-mappings|
+
+==============================================================================
+INTRODUCTION				*operator-sort-introduction*
+
+*operator-sort* is a Vim plugin to provide operators to sort a text.
+
+Requirements:
+
+- Vim 8.0 or later
+- |operator-user| 0.1.0 or later
+  https://github.com/kana/vim-operator-user
+
+==============================================================================
+USAGE						*operator-sort-usage*
+
+At first, you have to map arbitrary key sequences to a operator like the
+following:
+>
+	map gs  <Plug>(operator-sort)
+<
+Suppose that you edit a buffer with the following text:
+>
+	banana
+	apple
+	2
+	10
+	1
+	cake
+<
+Then, when you execute |<Plug>(operator-sort)| to the entire content of the
+buffer, it will sort the text according to alphabetical order.
+
+>
+	1
+	10
+	2
+	apple
+	banana
+	cake
+<
+If you prefer the numerical sort order, you have to use
+|<Plug>(operator-sort-numeric)|. This operator will sort the text according to
+numerical order:
+>
+	apple
+	banana
+	cake
+	1
+	2
+	10
+<
+Those operators can also be used with a character-wise motion. For example,
+suppose that you edit the text separated by white-space.
+>
+	banana apple 2 10 1 cake
+	^
+<
+Then, when you execute |<Plug>(operator-sort)| with a character-wise motion
+and input a separator character (i.e. input "gs$ "), the text will be changed
+to the following:
+>
+	1 10 2 apple banana cake
+	^
+<
+
+==============================================================================
+INTERFACE					*operator-sort-interface*
+
+------------------------------------------------------------------------------
+KEY MAPPINGS					*operator-sort-key-mappings*
+
+<Plug>(operator-sort){motion}			*<Plug>(operator-sort)*
+{Visual}<Plug>(operator-sort)
+{Visual-charwise}<Plug>(operator-sort){separator}
+
+	Sort the text according to ascending alphabetic order.
+
+	When charwise visual-mode is active, sort the text using {separator}
+	as a delimiter.
+
+<Plug>(operator-sort!){motion}			*<Plug>(operator-sort!)*
+{Visual}<Plug>(operator-sort!)
+{Visual-charwise}<Plug>(operator-sort!){separator}
+
+	Sort the text according to descending alphabetic order.
+
+<Plug>(operator-sort-numeric){motion}	*<Plug>(operator-sort-numeric)*
+{Visual}<Plug>(operator-sort-numeric)
+{Visual-charwise}<Plug>(operator-sort-numeric){separator}
+
+	Sort the text according to ascending numerical order.
+
+<Plug>(operator-sort-numeric!){motion}	*<Plug>(operator-sort-numeric!)*
+{Visual}<Plug>(operator-sort-numeric!)
+{Visual-charwise}<Plug>(operator-sort-numeric!){separator}
+
+	Sort the text according to descending numerical order.
+
+==============================================================================
+vim:tw=78:ts=8:ft=help
