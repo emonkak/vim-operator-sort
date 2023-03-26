@@ -107,10 +107,10 @@ function! s:test_linewise() abort
   \ ])
 endfunction
 
-function! s:do_test(key_sequences, source, expected_result) abort
+function! s:do_test(key_strokes, source, expected_result) abort
   new
   call setline(1, a:source)
-  0verbose execute 'normal' a:key_sequences
+  0verbose call feedkeys(a:key_strokes, 'x')
   call assert_equal(a:expected_result, getline(1, line('$')))
   close!
 endfunction
