@@ -1,6 +1,6 @@
 # operator-sort
 
-**operator-sort** is a Vim plugin to provide operators to sort a text. As a sort method, alphabetical order and numerical order are available.
+**operator-sort** is a Vim plugin to provide operators to sort the text. You can choose alphabetical order or numerical order as a sort order.
 
 ## Requirements
 

@@ -1,4 +1,4 @@
-*operator-sort.txt*	Operators to sort a text
+*operator-sort.txt*	Operators to sort the text
 
 Author: Shota Nozaki <emonkak@gmail.com>
 License: MIT license
@@ -14,7 +14,7 @@ Interface	|operator-sort-interface|
 ==============================================================================
 INTRODUCTION				*operator-sort-introduction*
 
-*operator-sort* is a Vim plugin to provide operators to sort a text.
+*operator-sort* is a Vim plugin to provide operators to sort the text.
 
 Requirements:
 
