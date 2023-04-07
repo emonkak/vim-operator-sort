@@ -1,6 +1,8 @@
 #!/bin/env -S bash -c '${VIM-vim} -u NONE -i NONE -N -n -e -s --cmd "source %" $0'
 
 function s:run(runtime_dir) abort
+  set noswapfile
+
   let &runtimepath .= ',' . a:runtime_dir
   let &packpath .= ',' . a:runtime_dir
 
@@ -34,7 +36,9 @@ function s:run(runtime_dir) abort
   \    (len(test_functions) > 1 ? 'tests' : 'test')
   \    "\n"
 
+  let failed = 0
   let passed = 0
+  let ignored = 0
   let errors = []
   let start_time = reltime()
 
@@ -47,7 +51,7 @@ function s:run(runtime_dir) abort
 
     let v:errors = []
     try
-      call call(test_function, [])
+      let return_value = call(test_function, [])
 
       if len(v:errors) > 0
         let messages = map(
@@ -60,12 +64,21 @@ function s:run(runtime_dir) abort
         \     )
         \   }
         \ )
+        let failed += 1
         call add(errors, {
         \   'script_name': script_name,
         \   'test_name': test_name,
         \   'messages': messages,
         \ })
         echon 'FAILED' "\n"
+      elseif type(return_value) == v:t_string
+        let ignored += 1
+        call add(errors, {
+        \   'script_name': script_name,
+        \   'test_name': test_name,
+        \   'messages': [return_value],
+        \ })
+        echon 'ignored' "\n"
       else
         let passed += 1
         echon 'ok' "\n"
@@ -86,23 +99,22 @@ function s:run(runtime_dir) abort
   let elapsed_time = substitute(reltimestr(reltime(start_time)),
   \                             '^\s*', '', '')
 
-  if len(errors) > 0
-    for error in errors
-      echo '----' error.script_name . '::' . error.test_name '----'
-      for message in error.messages
-        echo message "\n"
-      endfor
+  for error in errors
+    echo '----' error.script_name . '::' . error.test_name '----'
+    for message in error.messages
+      echo message "\n"
     endfor
-  endif
+  endfor
 
   echo 'test result:'
-  \    (len(errors) > 0 ? 'FAILED.' : 'ok.')
+  \    (failed > 0 ? 'FAILED.' : 'ok.')
   \    passed 'passed;'
-  \    len(errors) 'failed;'
+  \    failed 'failed;'
+  \    ignored 'ignored;'
   \    'finished in' (elapsed_time . 's')
   \    "\n"
 
-  if len(errors) > 0
+  if failed > 0
     cquit!
   else
     qall!
