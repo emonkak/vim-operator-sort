@@ -1,4 +1,4 @@
-#!/bin/env -S bash -c '${VIM-vim} -u NONE -i NONE -N -n -e -s --cmd "source %" $0'
+#!/bin/env -S bash -c '${VIM-vim} -u NONE -i NONE -N -n -e -s --cmd "source %" "$0"'
 
 function s:run(runtime_dir) abort
   set noswapfile
