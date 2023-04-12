@@ -1,7 +1,7 @@
 function! operator#sort#sort(motion_wiseness) abort
   if a:motion_wiseness == 'char'
     call s:sort_charwise(s:ask_separator_character(),
-    \                    function('s:compare'))
+    \                    function('s:compare_asc'))
   else  " line or block
     '[,']sort
   endif
@@ -12,7 +12,8 @@ function! operator#sort#sort_numeric(motion_wiseness) abort
     call s:sort_charwise(s:ask_separator_character(),
     \                    function('s:compare_numeric'))
   else  " line or block
-    '[,']sort n
+    " Sort twice to sort non-numerical characters correctly.
+    '[,']sort | sort n
   endif
 endfunction
 
@@ -21,14 +22,15 @@ function! operator#sort#sort_numeric_reversed(motion_wiseness) abort
     call s:sort_charwise(s:ask_separator_character(),
     \                    function('s:compare_numeric_reversed'))
   else  " line or block
-    '[,']sort! n
+    " Sort twice to sort non-numerical characters correctly.
+    '[,']sort | sort! n
   endif
 endfunction
 
 function! operator#sort#sort_reversed(motion_wiseness) abort
   if a:motion_wiseness == 'char'
     call s:sort_charwise(s:ask_separator_character(),
-    \                    function('s:compare_reversed'))
+    \                    function('s:compare_desc'))
   else  " line or block
     '[,']sort!
   endif
@@ -36,6 +38,24 @@ endfunction
 
 function! s:ask_separator_character() abort
   return nr2char(getchar())
+endfunction
+
+function! s:compare_asc(x, y) abort
+  if a:x <# a:y
+    return -1
+  elseif a:x ># a:y
+    return 1
+  end
+  return 0
+endfunction
+
+function! s:compare_desc(x, y) abort
+  if a:x ># a:y
+    return -1
+  elseif a:x <# a:y
+    return 1
+  end
+  return 0
 endfunction
 
 function! s:compare_numeric(x, y) abort
@@ -56,19 +76,6 @@ endfunction
 
 function! s:compare_numeric_reversed(x, y) abort
   return s:compare_numeric(a:y, a:x)
-endfunction
-
-function! s:compare(x, y) abort
-  if a:x < a:y
-    return -1
-  else
-    return 1
-  end
-  return 0
-endfunction
-
-function! s:compare_reversed(x, y) abort
-  return s:compare(a:y, a:x)
 endfunction
 
 function! s:is_number(x) abort

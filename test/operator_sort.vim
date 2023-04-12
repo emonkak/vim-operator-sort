@@ -3,40 +3,40 @@ silent packadd! vim-operator-user
 silent runtime! plugin/operator/sort.vim
 
 function! s:test_characterwise() abort
-  let source = '1 a 3 c 21 123 -32 b 2 12'
+  let source = '1 a 3 c 21 123 -32 B 2 12'
 
   call s:do_test("\<Plug>(operator-sort)$ ", source, [
-  \   '-32 1 12 123 2 21 3 a b c',
+  \   '-32 1 12 123 2 21 3 B a c',
   \ ])
 
   call s:do_test("\<Plug>(operator-sort!)$ ", source, [
-  \   'c b a 3 21 2 123 12 1 -32',
+  \   'c a B 3 21 2 123 12 1 -32',
   \ ])
 
   call s:do_test("\<Plug>(operator-sort-numeric)$ ", source, [
-  \   'a b c -32 1 2 3 12 21 123',
+  \   'B a c -32 1 2 3 12 21 123',
   \ ])
 
   call s:do_test("\<Plug>(operator-sort-numeric!)$ ", source, [
-  \   '123 21 12 3 2 1 -32 c b a',
+  \   '123 21 12 3 2 1 -32 c a B',
   \ ])
 
-  let source = '1, a, 3, c, 21, 123, -32, b, 2, 12'
+  let source = '1, a, 3, c, 21, 123, -32, B, 2, 12'
 
   call s:do_test("\<Plug>(operator-sort)$,", source, [
-  \   '-32, 1, 12, 123, 2, 21, 3, a, b, c',
+  \   '-32, 1, 12, 123, 2, 21, 3, B, a, c',
   \ ])
 
   call s:do_test("\<Plug>(operator-sort!)$,", source, [
-  \   'c, b, a, 3, 21, 2, 123, 12, 1, -32',
+  \   'c, a, B, 3, 21, 2, 123, 12, 1, -32',
   \ ])
 
   call s:do_test("\<Plug>(operator-sort-numeric)$,", source, [
-  \   'a, b, c, -32, 1, 2, 3, 12, 21, 123',
+  \   'B, a, c, -32, 1, 2, 3, 12, 21, 123',
   \ ])
 
   call s:do_test("\<Plug>(operator-sort-numeric!)$,", source, [
-  \   '123, 21, 12, 3, 2, 1, -32, c, b, a',
+  \   '123, 21, 12, 3, 2, 1, -32, c, a, B',
   \ ])
 endfunction
 
@@ -49,7 +49,7 @@ function! s:test_linewise() abort
   \   '21',
   \   '123',
   \   '-32',
-  \   'b',
+  \   'B',
   \   '2',
   \   '12',
   \ ]
@@ -62,15 +62,15 @@ function! s:test_linewise() abort
   \   '2',
   \   '21',
   \   '3',
+  \   'B',
   \   'a',
-  \   'b',
   \   'c',
   \ ])
 
   call s:do_test("\<Plug>(operator-sort!)G", source, [
   \   'c',
-  \   'b',
   \   'a',
+  \   'B',
   \   '3',
   \   '21',
   \   '2',
@@ -81,9 +81,9 @@ function! s:test_linewise() abort
   \ ])
 
   call s:do_test("\<Plug>(operator-sort-numeric)G", source, [
+  \   'B',
   \   'a',
   \   'c',
-  \   'b',
   \   '-32',
   \   '1',
   \   '2',
@@ -101,9 +101,9 @@ function! s:test_linewise() abort
   \   '2',
   \   '1',
   \   '-32',
-  \   'b',
   \   'c',
   \   'a',
+  \   'B',
   \ ])
 endfunction
 
