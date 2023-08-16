@@ -3,27 +3,25 @@ function! operator#sort#sort(motion_wiseness) abort
     call s:sort_charwise(s:ask_separator_character(),
     \                    function('s:compare_asc'))
   else  " line or block
-    '[,']sort
+    '[,']call s:sort_linewise(function('s:compare_asc'))
   endif
 endfunction
 
 function! operator#sort#sort_numeric(motion_wiseness) abort
   if a:motion_wiseness == 'char'
     call s:sort_charwise(s:ask_separator_character(),
-    \                    function('s:compare_numeric'))
+    \                    function('s:compare_numeric_asc'))
   else  " line or block
-    " Sort twice to sort non-numerical characters correctly.
-    '[,']sort | sort n
+    '[,']call s:sort_linewise(function('s:compare_numeric_asc'))
   endif
 endfunction
 
 function! operator#sort#sort_numeric_reversed(motion_wiseness) abort
   if a:motion_wiseness == 'char'
     call s:sort_charwise(s:ask_separator_character(),
-    \                    function('s:compare_numeric_reversed'))
+    \                    function('s:compare_numeric_desc'))
   else  " line or block
-    " Sort twice to sort non-numerical characters correctly.
-    '[,']sort | sort! n
+    '[,']call s:sort_linewise(function('s:compare_numeric_desc'))
   endif
 endfunction
 
@@ -32,7 +30,7 @@ function! operator#sort#sort_reversed(motion_wiseness) abort
     call s:sort_charwise(s:ask_separator_character(),
     \                    function('s:compare_desc'))
   else  " line or block
-    '[,']sort!
+    '[,']call s:sort_linewise(function('s:compare_desc'))
   endif
 endfunction
 
@@ -58,7 +56,7 @@ function! s:compare_desc(x, y) abort
   return 0
 endfunction
 
-function! s:compare_numeric(x, y) abort
+function! s:compare_numeric_asc(x, y) abort
   " This algorithm is copied from `:sort n` command.
   " https://github.com/vim/vim/blob/v8.0.0000/src/ex_cmds.c#L312
   let x_is_num = s:is_number(a:x)
@@ -74,8 +72,8 @@ function! s:compare_numeric(x, y) abort
   endif
 endfunction
 
-function! s:compare_numeric_reversed(x, y) abort
-  return s:compare_numeric(a:y, a:x)
+function! s:compare_numeric_desc(x, y) abort
+  return s:compare_numeric_asc(a:y, a:x)
 endfunction
 
 function! s:is_number(x) abort
@@ -111,19 +109,33 @@ function! s:partition(text, pattern) abort
 endfunction
 
 function! s:sort_charwise(separator, comparer) abort
-  let reg_u = [@", getregtype('"')]
-  let pattern = '\V\%(\n\|\s\)\*\%(\n\|'
-  \           . escape(a:separator, '\\')
-  \           . '\)\%(\n\|\s\)\*'
+  let reg_value = getreg('"')
+  let reg_type = getregtype('"')
   try
+    let pattern = '\V\%(\n\|\s\)\*\%(\n\|'
+    \           . escape(a:separator, '\\')
+    \           . '\)\%(\n\|\s\)\*'
     normal! `[v`]""y
     let [xs, ys] = s:partition(@", pattern)
     call sort(xs, a:comparer)
-
     let @" = join(map(s:transpose([xs, ys]), 'join(v:val, "")'), '')
     normal! `[v`]""P`[
   finally
-    call setreg('"', reg_u[0], reg_u[1])
+    call setreg('"', reg_value, reg_type)
+  endtry
+endfunction
+
+function! s:sort_linewise(comparer) abort range
+  let reg_value = getreg('"')
+  let reg_type = getregtype('"')
+  try
+    execute a:firstline . ',' . a:lastline 'yank "'
+    let lines = split(@", "\n")
+    call sort(lines, a:comparer)
+    let @" = join(lines, "\n")
+    normal! `[V`]""p
+  finally
+    call setreg('"', reg_value, reg_type)
   endtry
 endfunction
 

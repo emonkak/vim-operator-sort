@@ -42,6 +42,7 @@ endfunction
 
 function! s:test_linewise() abort
   let source = [
+  \   '@',
   \   '1',
   \   'a',
   \   '3',
@@ -52,9 +53,11 @@ function! s:test_linewise() abort
   \   'B',
   \   '2',
   \   '12',
+  \   '@',
   \ ]
 
-  call s:do_test("\<Plug>(operator-sort)G", source, [
+  call s:do_test("jVGk\<Plug>(operator-sort)", source, [
+  \   '@',
   \   '-32',
   \   '1',
   \   '12',
@@ -65,9 +68,11 @@ function! s:test_linewise() abort
   \   'B',
   \   'a',
   \   'c',
+  \   '@',
   \ ])
 
-  call s:do_test("\<Plug>(operator-sort!)G", source, [
+  call s:do_test("jVGk\<Plug>(operator-sort!)", source, [
+  \   '@',
   \   'c',
   \   'a',
   \   'B',
@@ -78,9 +83,11 @@ function! s:test_linewise() abort
   \   '12',
   \   '1',
   \   '-32',
+  \   '@',
   \ ])
 
-  call s:do_test("\<Plug>(operator-sort-numeric)G", source, [
+  call s:do_test("jVGk\<Plug>(operator-sort-numeric)", source, [
+  \   '@',
   \   'B',
   \   'a',
   \   'c',
@@ -91,9 +98,11 @@ function! s:test_linewise() abort
   \   '12',
   \   '21',
   \   '123',
+  \   '@',
   \ ])
 
-  call s:do_test("\<Plug>(operator-sort-numeric!)G", source, [
+  call s:do_test("jVGk\<Plug>(operator-sort-numeric!)", source, [
+  \   '@',
   \   '123',
   \   '21',
   \   '12',
@@ -104,6 +113,7 @@ function! s:test_linewise() abort
   \   'c',
   \   'a',
   \   'B',
+  \   '@',
   \ ])
 endfunction
 
