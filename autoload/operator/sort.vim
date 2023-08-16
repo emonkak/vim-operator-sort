@@ -1,37 +1,17 @@
 function! operator#sort#sort(motion_wiseness) abort
-  if a:motion_wiseness == 'char'
-    call s:sort_charwise(s:ask_separator_character(),
-    \                    function('s:compare_asc'))
-  else  " line or block
-    '[,']call s:sort_linewise(function('s:compare_asc'))
-  endif
+  call s:do_operator(a:motion_wiseness, function('s:compare_asc'))
 endfunction
 
 function! operator#sort#sort_numeric(motion_wiseness) abort
-  if a:motion_wiseness == 'char'
-    call s:sort_charwise(s:ask_separator_character(),
-    \                    function('s:compare_numeric_asc'))
-  else  " line or block
-    '[,']call s:sort_linewise(function('s:compare_numeric_asc'))
-  endif
+  call s:do_operator(a:motion_wiseness, function('s:compare_numeric_asc'))
 endfunction
 
 function! operator#sort#sort_numeric_reversed(motion_wiseness) abort
-  if a:motion_wiseness == 'char'
-    call s:sort_charwise(s:ask_separator_character(),
-    \                    function('s:compare_numeric_desc'))
-  else  " line or block
-    '[,']call s:sort_linewise(function('s:compare_numeric_desc'))
-  endif
+  call s:do_operator(a:motion_wiseness, function('s:compare_numeric_desc'))
 endfunction
 
 function! operator#sort#sort_reversed(motion_wiseness) abort
-  if a:motion_wiseness == 'char'
-    call s:sort_charwise(s:ask_separator_character(),
-    \                    function('s:compare_desc'))
-  else  " line or block
-    '[,']call s:sort_linewise(function('s:compare_desc'))
-  endif
+  call s:do_operator(a:motion_wiseness, function('s:compare_desc'))
 endfunction
 
 function! s:ask_separator_character() abort
@@ -76,8 +56,18 @@ function! s:compare_numeric_desc(x, y) abort
   return s:compare_numeric_asc(a:y, a:x)
 endfunction
 
+function! s:do_operator(motion_wiseness, comparer) abort
+  if a:motion_wiseness == 'char'
+    call s:sort_charwise(s:ask_separator_character(), a:comparer)
+  elseif a:motion_wiseness ==# 'block'
+    call s:sort_blockwise(a:comparer)
+  else  " line
+    '[,']call s:sort_linewise(a:comparer)
+  endif
+endfunction
+
 function! s:is_number(x) abort
-  return a:x =~ '^-\?\d\+'
+  return a:x =~ '^\s*-\?\d'
 endfunction
 
 function! s:partition(text, pattern) abort
@@ -118,25 +108,35 @@ function! s:sort_charwise(separator, comparer) abort
     normal! `[v`]""y
     let [xs, ys] = s:partition(@", pattern)
     call sort(xs, a:comparer)
-    let @" = join(map(s:transpose([xs, ys]), 'join(v:val, "")'), '')
+    call setreg(
+    \   '"',
+    \   join(map(s:transpose([xs, ys]), 'join(v:val, "")'), ''),
+    \   'c'
+    \ )
     normal! `[v`]""P`[
   finally
     call setreg('"', reg_value, reg_type)
   endtry
 endfunction
 
-function! s:sort_linewise(comparer) abort range
+function! s:sort_blockwise(comparer) abort
   let reg_value = getreg('"')
   let reg_type = getregtype('"')
   try
-    execute a:firstline . ',' . a:lastline 'yank "'
+    execute "normal!" '`['. "\<C-v>" . '`]""y'
     let lines = split(@", "\n")
     call sort(lines, a:comparer)
-    let @" = join(lines, "\n")
-    normal! `[V`]""p
+    call setreg('"', join(lines, "\n"), 'b')
+    execute "normal!" '`['. "\<C-v>" . '`]""p'
   finally
     call setreg('"', reg_value, reg_type)
   endtry
+endfunction
+
+function! s:sort_linewise(comparer) abort range
+  let lines = getline(a:firstline, a:lastline)
+  call sort(lines, a:comparer)
+  call setline(a:firstline, lines)
 endfunction
 
 function! s:transpose(xss) abort
