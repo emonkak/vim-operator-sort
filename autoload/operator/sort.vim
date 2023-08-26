@@ -45,7 +45,7 @@ function! s:compare_numeric_asc(x, y) abort
     if x_is_num
       return str2nr(a:x, 10) - str2nr(a:y, 10)
     else
-      return a:x == a:y ? 0 : a:x > a:y ? 1 : -1
+      return a:x ==# a:y ? 0 : a:x ># a:y ? 1 : -1
     endif
   else
     return x_is_num - y_is_num
